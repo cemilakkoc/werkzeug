@@ -392,7 +392,7 @@ class MultiDict(TypeConversionDict):
         """
         dict.setdefault(self, key, []).append(value)
 
-    def getlist(self, key, type=None):
+    def getlist(self, key, type=None, default_key=None):
         """Return the list of items for a given key. If that key is not in the
         `MultiDict`, the return value will be an empty list.  Just like `get`,
         `getlist` accepts a `type` parameter.  All items will be converted
@@ -402,12 +402,18 @@ class MultiDict(TypeConversionDict):
         :param type: A callable that is used to cast the value in the
                      :class:`MultiDict`.  If a :exc:`ValueError` is raised
                      by this callable the value will be removed from the list.
+        :param default_key: Value that will be returned in a list
+                    if :exc:`ValueError` is raised, instead of an empty list.
+        
         :return: a :class:`list` of all the values for the key.
         """
         try:
             rv = dict.__getitem__(self, key)
         except KeyError:
+            if default_key:
+                return [default_key]
             return []
+            
         if type is None:
             return list(rv)
         result = []
